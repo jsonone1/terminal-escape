@@ -1,0 +1,93 @@
+:root {
+	--terminal-green: #33ff33;
+	--terminal-bg: #0a0a0a;
+	--terminal-dim: #116611;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: var(--terminal-bg);
+	color: var(--terminal-green);
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 16px;
+	height: 100vh;
+	padding: 20px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	text-shadow: 0 0 8px rgba(51, 255, 51, 0.35);
+}
+
+body::before {
+	content: " ";
+	display: block;
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(225, 0, 0, 0.06), rgba(0, 225, 0, 0.02), rgba(0, 0, 225, 0.06));
+	z-index: 2;
+	background-size: 100% 4px, 3px 100%;
+	pointer-events: none;
+}
+
+#terminal-history {
+	flex-grow: 1;
+	overflow-y: auto;
+	margin-bottom: 20px;
+	padding-right: 10px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	border: 1px solid rgba(17, 102, 17, 0.5);
+	padding: 14px;
+	background: rgba(10, 10, 10, 0.35);
+	border-radius: 6px;
+}
+
+.log-entry {
+	margin-bottom: 8px;
+	white-space: pre-wrap;
+	line-height: 1.45;
+	letter-spacing: 0.02em;
+}
+
+.command-echo {
+	color: #ffff;
+}
+
+.error-text {
+	color: #ff3333;
+}
+
+.success-text {
+	color: #33ffff;
+	font-weight: bold;
+}
+
+#input-container {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	border-top: 1px solid var(--terminal-dim);
+	padding-top: 10px;
+}
+
+.prompt {
+	color: #baffba;
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+#terminal-input {
+	background: transparent;
+	border: none;
+	color: var(--terminal-green);
+	font: inherit;
+	flex-grow: 1;
+	outline: none;
+	caret-color: var(--terminal-green);
+}
