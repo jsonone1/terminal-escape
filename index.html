@@ -5,206 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Override</title>
-    <style>
-        :root {
-            --terminal-green:#33ff33;
-            --terminal-bg: #0a0a0a;
-            --terminal-dim: #116611;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--terminal-bg);
-            color: var(--terminal-green);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            height: 100vh;
-            padding: 20px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        body::before{
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(225, 0, 0, 0.06), rgba(0, 225, 0, 0.02), rgba(0, 0, 225, 0.06));
-            z-index: 2;
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
-        }
-
-        #terminal-history {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            padding-right: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content:flex-end;
-        }
-
-        .log-entry {
-            margin-bottom: 8px;
-            white-space: pre-wrap;
-            line-height: 1.4;
-        }
-
-        .command-echo {
-            color: #ffff;
-        }
-        .error-text{
-            color: #ff3333;
-
-        }
-
-        .success-text {
-            color:#33ffff;
-            font-weight: bold;
-
-        }
-
-        #input-container {
-            display: flex;
-            align-items: center;
-            border-top: 1px solid var(--terminal-dim);
-            padding-top: 10px;
-        }
-
-        #terminal-input {
-            background: transparent;
-            border: none;
-            color: var(--terminal-green);
-            font-family: inherit;
-            flex-grow: 1;
-            outline: none;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="terminal-history">
         <div class="log-entry">==================================================</div>
-        <div class="log-entry">System lockdown active.</div>
-        <div class="log-entry">All exit paths are sealed. Security protocol engaged.</div>
-        <div class="log-entry">Type 'help' for a list of available commands.</div>
+        <div class="log-entry">System lockdown is active.</div>
+        <div class="log-entry">Every exit is sealed. Security is doing its thing.</div>
+        <div class="log-entry">Need the command list? Type 'help'.</div>
         <div class="log-entry">==================================================</div>
     </div>
 
         <div id="input-container">
-        <span class="prompt">guest@sys_override:~\$</span>
+        <span id="terminal-prompt" class="prompt">system@lockdown:~$</span>
         <input type="text" id="terminal-input" autofocus autocomplete="off" spellcheck="false">
     </div>
 
-    <script>
-        const terminalHistory = document.getElementById('terminal-history');
-        const terminalInput = document.getElementById('terminal-input');
-
-        const state = {
-            unlocked: false,
-            files: {
-                'readme.txt': 'SYSTEM MEMO:\nSecurity breach detected. The root override passcode has been fragmented.\nCheck the hidden log file for fragment 1.',
-                '.hidden_log.bak': 'FRAGMENT 1: "break"\nHint: Look into system configurations for FRAGMENT 2.',
-                'sys_config.cfg': 'CONFIG_RECOVERY_KEY: "0ut_2026"\nCombine fragments chronologically to form the override key.',
-            }
-        };
-
-        document.addEventListener('click', () => terminalInput.focus());
-
-        terminalInput.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                const rawInput = this.value;
-                const cleanedInput = rawInput.trim();
-                
-                if (cleanedInput.length > 0) {
-                    executeCommand(cleanedInput);
-                }
-                
-                this.value = '';
-            }
-        });
-
-        function writeToTerminal(text, className = '') {
-            const entry = document.createElement('div');
-            entry.classList.add('log-entry');
-            if (className) entry.classList.add(className);
-            entry.textContent = text;
-            terminalHistory.appendChild(entry);
-            terminalHistory.scrollTop = terminalHistory.scrollHeight;
-        }
-
-        function executeCommand(inputLine) {
-            writeToTerminal(`guest@sys_override:~$ ${inputLine}`, 'command-echo');
-
-            const parts = inputLine.split(' ');
-            const command = parts[0].toLowerCase();
-            const argument = parts.slice(1).join(' ');
-
-            if (state.unlocked) {
-                writeToTerminal("System already breached. Core access granted.", 'success-text');
-                return;
-            }
-
-            switch(command) {
-                case 'help':
-                    writeToTerminal(
-                        "Available commands:\n" +
-                        "  ls             - List directory contents\n" +
-                        "  cat [file]     - Display file contents\n" +
-                        "  override [key] - Attempt core override sequence\n" +
-                        "  clear          - Clear the terminal"
-                    );
-                    break;
-
-                case 'ls':
-                    if (argument === '-a') {
-                        writeToTerminal(Object.keys(state.files).join('    '));
-                    } else {
-                        const visibleFiles = Object.keys(state.files).filter(f => !f.startsWith('.'));
-                        writeToTerminal(visibleFiles.join('    '));
-                        writeToTerminal("\n[System Warning: Some directories contain hidden data system nodes (try parameters).]", 'error-text');
-                    }
-                    break;
-
-                case 'cat':
-                    if (!argument) {
-                        writeToTerminal("Usage: cat [filename]", 'error-text');
-                    } else if (state.files[argument]) {
-                        writeToTerminal(state.files[argument]);
-                    } else {
-                        writeToTerminal(`cat: ${argument}: No such file or directory`, 'error-text');
-                    }
-                    break;
-
-                case 'clear':
-                    terminalHistory.innerHTML = '';
-                    break;
-
-                case 'override':
-                    if (!argument) {
-                        writeToTerminal("Usage: override [passcode_key]", 'error-text');
-                    } else if (argument === 'break0ut_2026') {
-                        state.unlocked = true;
-                        writeToTerminal("\n[!!!] Override successful [!!!]\n", 'success-text');
-                        writeToTerminal("==================================================", 'success-text');
-                        writeToTerminal("Access granted. Firewall breached. You are free.", 'success-text');
-                        writeToTerminal("==================================================", 'success-text');
-                    } else {
-                        writeToTerminal("Access denied: invalid override key.", 'error-text');
-                    }
-                    break;
-
-                default:
-                    writeToTerminal(`bash: ${command}: command not found`, 'error-text');
-            }
-        }
-    </script>
+    <script src="morestuff.js"></script>
 </body>
 </html>
